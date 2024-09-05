@@ -1,0 +1,100 @@
+@startuml zohan-c4-component-diagram
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define DEVICONS2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/main/icons/devicons2
+!define MATERIAL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/material
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/nodejs.puml
+!include DEVICONS/react.puml
+!include DEVICONS/mongodb.puml
+!include DEVICONS2/mongoose_original_wordmark.puml
+!include MATERIAL/map.puml
+!include MATERIAL/mail.puml
+!include FONTAWESOME/server.puml
+
+LAYOUT_WITH_LEGEND()
+LAYOUT_TOP_DOWN()
+
+System_Ext(gmail_smtp, "Gmail SMTP", "Externí SMTP server pro odesílání emailů.", "mail")
+System_Ext(mapy, "Mapy.cz API", "Externí API poskytující našeptávání adres.", "map")
+System_Ext(ares, "ARES REST API", "Externí API pro získávání údajů o právnických osobách.", "server")
+System_Ext(mongo, "MongoDB Atlas", "Externí databáze hostovaná v MongoDB Atlas.", "mongodb")
+
+Container(spa_user, "SPA pro uživatele", "React, Next.js", "Single-page aplikace pro běžné uživatele. Aplikace umožňuje prohlížet veřejné informace a vytvářet rezervace.", "react")
+Container(spa_admin, "SPA pro administrátory", "React, Next.js", "Single-page aplikace pro zaměstnance. Aplikace umožňuje spravovat obchodní profil a rezervace.", "react")
+
+Container_Boundary(api, "API aplikace") {
+    ' ADMIN CONTROLLERS
+    Component(admin_controller, "Admin Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro správu obchodních profilů.")
+    Boundary(a, "") {
+        Component(admin_booking_controller, "Admin Booking Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro správu rezervací.")
+        Component(admin_company_controller, "Admin Company Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro správu obchodních profilů.")
+        Component(admin_customer_controller, "Admin Customer Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro získání informací historických zákázníku firmy.")
+        Component(admin_staff_controller, "Admin Staff Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro správu zaměstnanců a zároveň zpracovává autentizační a autorizační požadavky.")
+        Component(admin_venue_controller, "Admin Venue Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro správu poboček.")
+    }
+
+    ' PLATFORM CONTROLLERS
+    Component(address_controller, "Address Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro získávání adresního našeptávání.")
+    Component(auth_controller, "Auth Controller", "Koa-Joi-router", "Řídí a zpracovává autentizační a autorizační požadavky.")
+    Component(booking_controller, "Booking Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro vytváření a správu rezervací.")
+    Component(venue_controller, "Venue Controller", "Koa-Joi-router", "Řídí a zpracovává požadavky pro získávání informací o pobočkách.")
+
+    ' ODM
+    Component(mongoose_odm, "Mongoose ODM", "mongoose knihovna pro Node.js", "Centralizovaný přístup pro správu databáze MongoDB pomocí Mongoose.", "mongoose_original_wordmark")
+
+    Rel(admin_controller, admin_booking_controller, "Předává požadavky")
+    Rel(admin_controller, admin_company_controller, "Předává požadavky")
+    Rel(admin_controller, admin_customer_controller, "Předává požadavky")
+    Rel(admin_controller, admin_staff_controller, "Předává požadavky")
+    Rel(admin_controller, admin_venue_controller, "Předává požadavky")
+
+    Rel(admin_booking_controller, mongoose_odm, "Používá pro CRUD operace")
+    Rel(admin_company_controller, mongoose_odm, "Používá pro CRUD operace")
+    Rel(admin_customer_controller, mongoose_odm, "Používá pro READ operace")
+    Rel(admin_staff_controller, mongoose_odm, "Používá pro CRUD operace")
+    Rel(admin_venue_controller, mongoose_odm, "Používá pro CRUD operace")
+
+    Rel(auth_controller, mongoose_odm, "Používá pro CRUD operace")
+    Rel(booking_controller, mongoose_odm, "Používá pro CRUD operace")
+    Rel(venue_controller, mongoose_odm, "Používá pro CRUD operace")
+    
+    Rel(address_controller, mapy, "Žádá o adresní našeptávání", "HTTPS")
+    Rel(admin_venue_controller, mapy, "Žádá o adresní našeptávání", "HTTPS")
+
+    Rel(auth_controller, gmail_smtp, "Žádá o odeslání emailu", "SMTP")
+    Rel(booking_controller, gmail_smtp, "Žádá o odeslání emailu", "SMTP")
+
+    Rel(admin_company_controller, ares, "Žádá o informace o firmě", "HTTPS")
+}
+
+Rel(spa_user, address_controller, "API požadavky", "async JSON/HTTPS")
+Rel(spa_user, auth_controller, "API požadavky", "async JSON/HTTPS")
+Rel(spa_user, booking_controller, "API požadavky", "async JSON/HTTPS")
+Rel(spa_user, venue_controller, "API požadavky", "async JSON/HTTPS")
+
+Rel(spa_admin, admin_controller, "API požadavky", "async JSON/HTTPS")
+Rel(spa_admin, address_controller, "API požadavky", "async JSON/HTTPS")
+
+Rel(mongoose_odm, mongo, "Ukládá a získává data", "TLS/SSL")
+
+Lay_R(spa_admin, spa_user)
+
+Lay_D(admin_controller, admin_booking_controller)
+Lay_D(address_controller, admin_booking_controller)
+Lay_D(booking_controller, admin_booking_controller)
+Lay_D(venue_controller, admin_booking_controller)
+Lay_D(auth_controller, admin_booking_controller)
+
+
+Lay_D(admin_venue_controller, mongoose_odm)
+Lay_D(mongoose_odm, gmail_smtp)
+Lay_D(mongoose_odm, mapy)
+Lay_D(mongoose_odm, ares)
+Lay_D(mongoose_odm, mongo)
+
+Lay_R(ares, mongo)
+Lay_R(mongo, mapy)
+Lay_R(mapy, gmail_smtp)
+
+@enduml

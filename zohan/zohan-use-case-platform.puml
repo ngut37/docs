@@ -1,0 +1,37 @@
+@startuml zohan-use-case-platform
+
+left to right direction
+
+actor "Nepřihlášený zákazník" as UnregisteredCustomer
+actor "Přihlášený zákazník" as RegisteredCustomer
+
+package "Platforma" {
+  left to right direction
+  usecase "NZ1: Zobrazení seznamu poboček" as UC_NZ1
+  usecase "NZ2: Vyhledávání poboček" as UC_NZ2
+  usecase "NZ3: Zobrazení detailu pobočky" as UC_NZ3
+  usecase "NZ4: Registrace" as UC_NZ4
+  usecase "PZ1: Přihlášení" as UC_PZ1
+  usecase "PZ2: Odhlášení" as UC_PZ2
+  usecase "PZ3: Vytvoření rezervace" as UC_PZ3
+  usecase "PZ4: Zrušení rezervace" as UC_PZ4
+  usecase "PZ5: Změna jména" as UC_PZ5
+  usecase "PZ6: Změna emailu" as UC_PZ6
+}
+
+UnregisteredCustomer --> UC_NZ1
+UnregisteredCustomer --> UC_NZ2
+UnregisteredCustomer --> UC_NZ3
+UnregisteredCustomer --> UC_NZ4
+
+UC_NZ1 <-- RegisteredCustomer
+UC_NZ2 <-- RegisteredCustomer
+UC_NZ3 <-- RegisteredCustomer
+UC_PZ1 <-- RegisteredCustomer
+UC_PZ2 <-- RegisteredCustomer
+UC_PZ3 <-- RegisteredCustomer
+UC_PZ4 <-- RegisteredCustomer
+UC_PZ5 <-- RegisteredCustomer
+UC_PZ6 <-- RegisteredCustomer
+
+@enduml

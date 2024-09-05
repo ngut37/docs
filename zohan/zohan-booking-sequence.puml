@@ -1,0 +1,56 @@
+@startuml zohan-booking-sequence
+' left to right direction
+
+' Define columns
+actor "Registered User" as User
+participant "Web Application" as Frontend
+participant "Backend Application" as Backend
+database "Database" as DB
+participant "Mailer" as Mailer
+
+' User initiates booking creation
+User -> Frontend : Initiates booking creation
+
+' group Get Venue Details
+Frontend -> Backend : Request venue details
+Backend -> DB : Fetch venue with service
+DB -> Backend : Return venue with service
+Backend -> Frontend : Return service list, staff, and opening time
+Frontend -> User : Display service list, staff, and opening time
+' end
+
+' group Select Service
+User -> Frontend : Selects service
+Frontend -> User : Update view to show staff
+' end
+
+' group Select Staff
+User -> Frontend : Selects staff
+Frontend -> User : Update view for selecting date
+' end
+
+' group Pick Date
+User -> Frontend : Picks a date
+Frontend -> Backend : Request available booking slots
+Backend -> DB : Get booking slots for the date and staff
+DB -> Backend : Return available slots
+Backend -> Frontend : Return available slots
+Frontend -> User : Display available slots
+' end
+
+' group Select Time Slot
+User -> Frontend : Picks time slot
+' end
+
+' group Confirm Booking
+User -> Frontend : Confirms booking
+Frontend -> Backend : Create booking request
+Backend -> DB : Create booking in database
+DB -> Backend : Return persisted booking data
+Backend -> Mailer : Send booking confirmation email
+Mailer -> Backend : Confirmation sent
+Backend -> Frontend : Return booking information
+Frontend -> User : Display booking success message
+' end
+
+@enduml

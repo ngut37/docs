@@ -1,0 +1,35 @@
+@startuml zohan-c4-system-context-diagram
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define MATERIAL https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/material
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/mongodb.puml
+!include MATERIAL/map.puml
+!include MATERIAL/mail.puml
+!include FONTAWESOME/server.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Přihlášený uživatel", "Uživatel, který může vytvářet rezervace a spravovat své údaje.")
+Person(public, "Nepřihlášený uživatel", "Uživatel, který nemá účet a může jen prohlížet veřejné informace.")
+Person(admin, "Zaměstnanec", "Uživatel administračního rozhraní, který může spravovat obchodní profil a její rezervace.")
+
+System(system, "Agregovaný systém pro zkrášlující služby", "Umožňuje přístup a práci s daty systému.", "server")
+
+System_Ext(mongo, "MongoDB Atlas", "Databáze hostovaná v MongoDB Atlas.", "mongodb")
+System_Ext(mapy, "Mapy.cz", "Poskytuje služby pro získávání adresních informací.", "map")
+System_Ext(ares, "ARES", "Poskytuje informace o právnických osobách.", "server")
+System_Ext(gmail, "Gmail", "Poskytuje služby pro odesílání emailů.", "mail")
+
+Rel(admin, system, "Používá")
+Rel(public, system, "Používá")
+Rel(user, system, "Používá")
+
+Rel(system, mongo, "Ukládá a získává data")
+Rel(system, mapy, "Získává adresní našeptávání")
+Rel(system, ares, "Získává údaje o právnických osobách")
+Rel(system, gmail, "Žádá o odeslání emailu")
+
+Rel(gmail, user, "Odesílá emaily")
+
+@enduml

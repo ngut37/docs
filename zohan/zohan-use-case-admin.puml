@@ -1,0 +1,47 @@
+@startuml zohan-use-case-admin
+left to right direction
+rectangle "Přihlášený uživatel" {
+left to right direction
+actor "Poskytovatel služeb - administrátor" as AdminServiceProvider
+actor "Poskytovatel služeb - editor" as EditorServiceProvider
+actor "Poskytovatel služeb - čtenář" as ReaderServiceProvider
+}
+actor "Poskytovatel služeb - nepřihlášený" as UnregisteredServiceProvider
+package "Administrační rozhraní" {
+left to right direction
+usecase "PS1: Registrace" as UC_PS1
+usecase "PS2: Přihlášení" as UC_PS2
+usecase "PS4: Vytvoření pobočky" as UC_PS4
+usecase "PS5: Úprava pobočky" as UC_PS5
+usecase "PS6: Smazání pobočky" as UC_PS6
+usecase "PS7: Vytvoření zaměstnance" as UC_PS7
+usecase "PS8: Úprava zaměstnance" as UC_PS8
+usecase "PS9: Smazání zaměstnance" as UC_PS9
+usecase "PS10: Vytvoření služby" as UC_PS10
+usecase "PS11: Úprava služby" as UC_PS11
+usecase "PS12: Smazání služby" as UC_PS12
+usecase "PS14: Vytvoření rezervace" as UC_PS14
+usecase "PS15: Úprava rezervace" as UC_PS15
+usecase "PS16: Smazání rezervace" as UC_PS16
+usecase "PS13: Zobrazení kalendáře rezervací" as UC_PS13
+}
+
+UnregisteredServiceProvider --> UC_PS1
+UnregisteredServiceProvider --> UC_PS2
+
+ReaderServiceProvider --> UC_PS13
+EditorServiceProvider --> UC_PS4
+EditorServiceProvider --> UC_PS5
+EditorServiceProvider --> UC_PS6
+EditorServiceProvider --> UC_PS7
+EditorServiceProvider --> UC_PS8
+EditorServiceProvider --> UC_PS9
+EditorServiceProvider --> UC_PS10
+EditorServiceProvider --> UC_PS11
+EditorServiceProvider --> UC_PS12
+EditorServiceProvider --> UC_PS14
+EditorServiceProvider --> UC_PS15
+EditorServiceProvider --> UC_PS16
+ReaderServiceProvider <|- EditorServiceProvider
+EditorServiceProvider <|- AdminServiceProvider
+@enduml
